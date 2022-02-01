@@ -23,8 +23,8 @@ import com.example.jetback.ui.utils.dpadFocusable
 fun ImageCard() {
     Card(
         modifier = Modifier
-            .size(width = 200.dp, height = 100.dp)
-            .padding(8.dp)
+            .size(width = 300.dp, height = 150.dp)
+            .padding(16.dp)
             .dpadFocusable(),
         shape = RoundedCornerShape(10),
         onClick = {},

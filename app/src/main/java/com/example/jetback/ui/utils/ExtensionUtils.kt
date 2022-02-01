@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -43,6 +45,7 @@ fun Modifier.dpadFocusable(
     unfocusedBorderColor: Color = Color(0x00f39c12),
     focusedBorderColor: Color = Color(0xfff39c12),
     focusBorderShape: Shape = RoundedCornerShape(10),
+    shouldResizeOnFocus: Boolean = true,
     onClick: () -> Unit = {},
 ) = composed {
     val boxInteractionSource = remember { MutableInteractionSource() }
@@ -52,6 +55,7 @@ fun Modifier.dpadFocusable(
         if (isItemFocused) focusedBorderColor
         else unfocusedBorderColor
     )
+    val itemScale by animateFloatAsState(targetValue = if (isItemFocused && shouldResizeOnFocus) 1.1f else 1f)
     var previousPress: PressInteraction.Press? by remember {
         mutableStateOf(null)
     }
@@ -73,6 +77,7 @@ fun Modifier.dpadFocusable(
     }
 
     this
+        .scale(itemScale)
         .onGloballyPositioned {
             boxSize = it.size
         }
