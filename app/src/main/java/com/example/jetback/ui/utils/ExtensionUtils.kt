@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.LaunchedEffect
@@ -46,9 +47,9 @@ fun Modifier.dpadFocusable(
     focusBorderShape: Shape = RoundedCornerShape(10),
     shouldResizeOnFocus: Boolean = true,
     boxInteractionSource: MutableInteractionSource = MutableInteractionSource(),
-    isItemFocused: Boolean,
     onClick: () -> Unit = {},
 ) = composed {
+    val isItemFocused by boxInteractionSource.collectIsPressedAsState()
     val animatedBorderColor by animateColorAsState(
         targetValue =
         if (isItemFocused) focusedBorderColor

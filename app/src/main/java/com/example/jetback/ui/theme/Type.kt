@@ -31,4 +31,10 @@ val LandingScreenTypography = Typography(
         fontSize = 24.sp,
         color = Color.White
     ),
+    body2 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp,
+        color = Color.White
+    ),
 )
