@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -102,12 +103,12 @@ private fun UserDetails() {
         Column {
             Text(
                 "Shubham Singh",
-                style = LandingScreenTypography.h6,
+                style = LandingScreenTypography.h6.copy(color = MaterialTheme.colors.onSurface),
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 "shubham.singh@mutualmobile.com",
-                style = LandingScreenTypography.body2,
+                style = LandingScreenTypography.body2.copy(color = MaterialTheme.colors.onSurface),
                 modifier = Modifier.padding(4.dp)
             )
         }
