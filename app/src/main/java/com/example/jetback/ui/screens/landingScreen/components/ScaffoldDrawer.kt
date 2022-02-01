@@ -1,6 +1,8 @@
 package com.example.jetback.ui.screens.landingScreen.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -54,11 +59,17 @@ fun ScaffoldDrawer(scaffoldState: ScaffoldState) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OptionRow(title: String, icon: ImageVector) {
+    val interactionSource by remember { mutableStateOf(MutableInteractionSource()) }
+    val isItemFocused by interactionSource.collectIsFocusedAsState()
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .dpadFocusable(shouldResizeOnFocus = false)
+            .dpadFocusable(
+                shouldResizeOnFocus = false,
+                boxInteractionSource = interactionSource,
+                isItemFocused = isItemFocused
+            )
             .padding(horizontal = 8.dp, vertical = 8.dp),
     ) {
         Icon(icon, null, modifier = Modifier.size(32.dp))

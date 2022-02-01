@@ -44,7 +44,8 @@ fun ImageCard() {
             .size(width = 300.dp, height = 150.dp)
             .padding(16.dp)
             .dpadFocusable(
-                boxInteractionSource = boxInteractionSource
+                boxInteractionSource = boxInteractionSource,
+                isItemFocused = isItemFocused
             ),
         shape = RoundedCornerShape(10),
         onClick = {},
