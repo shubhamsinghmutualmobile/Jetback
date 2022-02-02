@@ -1,9 +1,6 @@
 package com.example.jetback.ui.utils
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
@@ -17,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnnecessaryComposedModifier", "CoroutineCreationDuringComposition")
+@SuppressLint("UnnecessaryComposedModifier")
 @ExperimentalComposeUiApi
 fun Modifier.dpadFocusable(
     borderWidth: Dp = 4.dp,
@@ -75,16 +73,16 @@ fun Modifier.dpadFocusable(
         isItemFocused = isItemFocused,
         lazyListState = rowState,
         itemIndex = rowItemIndex,
-        boxSize = boxSize,
-        scope = scope
+        scope = scope,
+        distanceToScroll = boxSize.width.toFloat()
     )
 
     observeLazyListState(
         isItemFocused = isItemFocused,
         lazyListState = columnState,
         itemIndex = columnItemIndex,
-        boxSize = boxSize,
-        scope = scope
+        scope = scope,
+        distanceToScroll = boxSize.height.toFloat()
     )
 
     LaunchedEffect(isItemFocused) {
@@ -155,33 +153,32 @@ fun Modifier.dpadFocusable(
         )
 }
 
-fun Context.showToast(msg: String = "Test Message", isLongToast: Boolean = false) {
-    Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
-    Log.d("MyTag", "Toast shown!")
-}
-
-@SuppressLint("CoroutineCreationDuringComposition", "ComposableNaming")
+@SuppressLint("ComposableNaming")
 @Composable
 fun observeLazyListState(
     isItemFocused: Boolean,
     lazyListState: LazyListState?,
     itemIndex: Int?,
-    boxSize: IntSize,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    distanceToScroll: Float
 ) {
     if (isItemFocused) {
         if (lazyListState?.isScrollInProgress == false) {
             if (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == itemIndex) {
-                scope.launch {
-                    itemIndex?.let { _ ->
-                        lazyListState.animateScrollBy(boxSize.width.toFloat())
+                SideEffect {
+                    scope.launch {
+                        itemIndex?.let { _ ->
+                            lazyListState.animateScrollBy(distanceToScroll)
+                        }
                     }
                 }
             } else if (lazyListState.layoutInfo.visibleItemsInfo.first().index == itemIndex) {
-                scope.launch {
-                    itemIndex.let { nnRowItemIndex ->
-                        if (nnRowItemIndex > 0) {
-                            lazyListState.animateScrollToItem(nnRowItemIndex - 1)
+                SideEffect {
+                    scope.launch {
+                        itemIndex.let { nnRowItemIndex ->
+                            if (nnRowItemIndex > 0) {
+                                lazyListState.animateScrollToItem(nnRowItemIndex - 1)
+                            }
                         }
                     }
                 }
