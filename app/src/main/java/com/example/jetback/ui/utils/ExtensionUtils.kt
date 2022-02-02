@@ -9,10 +9,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +38,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnnecessaryComposedModifier")
+@SuppressLint("UnnecessaryComposedModifier", "CoroutineCreationDuringComposition")
 @ExperimentalComposeUiApi
 fun Modifier.dpadFocusable(
     borderWidth: Dp = 4.dp,
@@ -47,6 +51,10 @@ fun Modifier.dpadFocusable(
     shouldResizeOnFocus: Boolean = true,
     boxInteractionSource: MutableInteractionSource = MutableInteractionSource(),
     isItemFocused: Boolean,
+    columnState: LazyListState? = null,
+    rowState: LazyListState? = null,
+    rowItemIndex: Int? = null,
+    columnItemIndex: Int? = null,
     onClick: () -> Unit = {},
 ) = composed {
     val animatedBorderColor by animateColorAsState(
@@ -62,6 +70,22 @@ fun Modifier.dpadFocusable(
     var boxSize by remember {
         mutableStateOf(IntSize(0, 0))
     }
+
+    observeLazyListState(
+        isItemFocused = isItemFocused,
+        lazyListState = rowState,
+        itemIndex = rowItemIndex,
+        boxSize = boxSize,
+        scope = scope
+    )
+
+    observeLazyListState(
+        isItemFocused = isItemFocused,
+        lazyListState = columnState,
+        itemIndex = columnItemIndex,
+        boxSize = boxSize,
+        scope = scope
+    )
 
     LaunchedEffect(isItemFocused) {
         previousPress?.let {
@@ -134,4 +158,34 @@ fun Modifier.dpadFocusable(
 fun Context.showToast(msg: String = "Test Message", isLongToast: Boolean = false) {
     Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
     Log.d("MyTag", "Toast shown!")
+}
+
+@SuppressLint("CoroutineCreationDuringComposition", "ComposableNaming")
+@Composable
+fun observeLazyListState(
+    isItemFocused: Boolean,
+    lazyListState: LazyListState?,
+    itemIndex: Int?,
+    boxSize: IntSize,
+    scope: CoroutineScope
+) {
+    if (isItemFocused) {
+        if (lazyListState?.isScrollInProgress == false) {
+            if (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == itemIndex) {
+                scope.launch {
+                    itemIndex?.let { _ ->
+                        lazyListState.animateScrollBy(boxSize.width.toFloat())
+                    }
+                }
+            } else if (lazyListState.layoutInfo.visibleItemsInfo.first().index == itemIndex) {
+                scope.launch {
+                    itemIndex.let { nnRowItemIndex ->
+                        if (nnRowItemIndex > 0) {
+                            lazyListState.animateScrollToItem(nnRowItemIndex - 1)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

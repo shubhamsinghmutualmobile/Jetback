@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -35,7 +37,12 @@ import com.example.jetback.ui.utils.dpadFocusable
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun ImageCard() {
+fun ImageCard(
+    columnState: LazyListState,
+    rowState: LazyListState,
+    rowItemIndex: Int,
+    columnItemIndex: Int
+) {
     val boxInteractionSource = remember { MutableInteractionSource() }
     val isItemFocused by boxInteractionSource.collectIsFocusedAsState()
     val imageToDisplay by remember { mutableStateOf(getRandomImageId()) }
@@ -45,7 +52,11 @@ fun ImageCard() {
             .padding(16.dp)
             .dpadFocusable(
                 boxInteractionSource = boxInteractionSource,
-                isItemFocused = isItemFocused
+                isItemFocused = isItemFocused,
+                columnState = columnState,
+                rowState = rowState,
+                rowItemIndex = rowItemIndex,
+                columnItemIndex = columnItemIndex
             ),
         shape = RoundedCornerShape(10),
         onClick = {},
@@ -60,6 +71,16 @@ fun ImageCard() {
                 },
                 contentDescription = null,
                 contentScale = ContentScale.Crop
+            )
+            Text(
+                rowItemIndex.toString(),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.TopStart)
+                    .background(
+                        color = Color.Black,
+                        shape = CircleShape
+                    )
             )
             AnimatedVisibility(
                 visible = isItemFocused,
