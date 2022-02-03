@@ -1,5 +1,11 @@
 package com.example.jetback.ui.screens.landingScreen.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +52,16 @@ object Carousel {
                 fontWeight = FontWeight.Bold
             )
         )
+
+    @OptIn(ExperimentalAnimationApi::class)
+    val defaultTransition = fadeIn(animationSpec = tween(700)) +
+        fadeIn() with fadeOut()
 }
 
-@OptIn(ExperimentalPagerApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalPagerApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class,
+    ExperimentalAnimationApi::class
+)
 @Composable
 fun Carousel(
     listOfMovies: List<Pair<Pair<Int, String>, String>> = ImageCard.listOfItems
@@ -64,14 +77,9 @@ fun Carousel(
             .fillMaxHeight(0.6f),
         contentAlignment = Alignment.BottomEnd,
     ) {
-        val imagePainter =
-            rememberImagePainter(data = listOfMovies[carouselState.currentPage].first.first) {
-                crossfade(250)
-                allowHardware(true)
-            }
-        Image(
-            imagePainter,
-            null,
+        AnimatedContent(
+            targetState = carouselState.targetPage,
+            transitionSpec = { Carousel.defaultTransition },
             modifier = Modifier
                 .fillMaxSize()
                 .dpadFocusable(
@@ -99,9 +107,20 @@ fun Carousel(
                             }
                         }
                     }
-                ),
-            contentScale = ContentScale.Crop
-        )
+                )
+        ) { index ->
+            val imagePainter =
+                rememberImagePainter(data = listOfMovies[index].first.first) {
+                    crossfade(250)
+                    allowHardware(true)
+                }
+            Image(
+                imagePainter,
+                null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -145,17 +164,27 @@ fun Carousel(
             Column(
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Text(
-                    listOfMovies[carouselState.currentPage].first.second,
-                    style = Carousel.CarouselTypography.h1,
-                    modifier = Modifier.padding(8.dp)
-                )
+                AnimatedContent(
+                    targetState = listOfMovies[carouselState.currentPage].first.second,
+                    transitionSpec = { Carousel.defaultTransition }
+                ) { movieTitle ->
+                    Text(
+                        movieTitle,
+                        style = Carousel.CarouselTypography.h1,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
                 Button(
                     onClick = {},
                     shape = CircleShape,
                     colors = buttonColors
                 ) {
-                    Text("Rent for ${listOfMovies[carouselState.currentPage].second}")
+                    AnimatedContent(
+                        targetState = listOfMovies[carouselState.currentPage].second,
+                        transitionSpec = { Carousel.defaultTransition }
+                    ) { movieRent ->
+                        Text("Rent now for $movieRent")
+                    }
                 }
             }
             HorizontalPagerIndicator(
