@@ -53,6 +53,9 @@ fun Modifier.dpadFocusable(
     rowState: LazyListState? = null,
     rowItemIndex: Int? = null,
     columnItemIndex: Int? = null,
+    isCarousel: Boolean = false,
+    carouselActionLeft: () -> Unit = {},
+    carouselActionRight: () -> Unit = {},
     onClick: () -> Unit = {},
 ) = composed {
     val animatedBorderColor by animateColorAsState(
@@ -109,6 +112,18 @@ fun Modifier.dpadFocusable(
             onClick()
         }
         .onKeyEvent {
+            if (isCarousel) {
+                when (it.key) {
+                    Key.DirectionLeft -> {
+                        carouselActionLeft()
+                        return@onKeyEvent true
+                    }
+                    Key.DirectionRight -> {
+                        carouselActionRight()
+                        return@onKeyEvent true
+                    }
+                }
+            }
             if (!listOf(Key.DirectionCenter, Key.Enter).contains(it.key)) {
                 return@onKeyEvent false
             }
