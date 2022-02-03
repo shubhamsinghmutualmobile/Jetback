@@ -1,6 +1,7 @@
 package com.example.jetback.ui.screens.landingScreen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import com.example.jetback.ui.screens.landingScreen.components.Carousel
 import com.example.jetback.ui.screens.landingScreen.components.ImageCard
 import com.example.jetback.ui.screens.landingScreen.components.ScaffoldDrawer
 import com.example.jetback.ui.screens.landingScreen.components.ScaffoldTopBar
@@ -46,15 +48,18 @@ fun LandingScreen() {
                 ScaffoldDrawer(scaffoldState)
             }
         ) {
-            val columnState = rememberLazyListState()
-            LazyColumn(state = columnState) {
-                repeat(times = 10) { columnItemIndex ->
-                    item {
-                        val rowState = rememberLazyListState()
-                        LazyRow(state = rowState) {
-                            repeat(times = 10) { rowItemIndex ->
-                                item {
-                                    ImageCard(columnState, rowState, rowItemIndex, columnItemIndex)
+            Column {
+                Carousel()
+                val columnState = rememberLazyListState()
+                LazyColumn(state = columnState) {
+                    repeat(times = 10) { columnItemIndex ->
+                        item {
+                            val rowState = rememberLazyListState()
+                            LazyRow(state = rowState) {
+                                repeat(times = 10) { rowItemIndex ->
+                                    item {
+                                        ImageCard(columnState, rowState, rowItemIndex, columnItemIndex)
+                                    }
                                 }
                             }
                         }

@@ -34,6 +34,17 @@ import com.example.jetback.R
 import com.example.jetback.ui.theme.LandingScreenTypography
 import com.example.jetback.ui.utils.dpadFocusable
 
+object ImageCard {
+    val listOfItems = listOf(
+        R.drawable.kgf_poster to "K.G.F" to "\$2.99/day",
+        R.drawable.ek_tha_tiger_poster to "Ek Tha Tiger" to "\$1.99/day",
+        R.drawable.highway_poster to "Highway" to "\$1.57/day",
+        R.drawable.lagaan_poster to "Lagaan" to "\$1.64/day",
+        R.drawable.raazi_poster to "Raazi" to "\$0.99/day",
+        R.drawable.war_poster to "WAR" to "\$1.25/day",
+    )
+}
+
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
@@ -118,13 +129,5 @@ fun ImageCard(
 }
 
 fun getRandomImageId(): Pair<Pair<Int, String>, String> {
-    val listOfItems = listOf(
-        R.drawable.kgf_poster to "K.G.F" to "\$2.99/day",
-        R.drawable.ek_tha_tiger_poster to "Ek Tha Tiger" to "\$1.99/day",
-        R.drawable.highway_poster to "Highway" to "\$1.57/day",
-        R.drawable.lagaan_poster to "Lagaan" to "\$1.64/day",
-        R.drawable.raazi_poster to "Raazi" to "\$0.99/day",
-        R.drawable.war_poster to "WAR" to "\$1.25/day",
-    )
-    return listOfItems.shuffled().random()
+    return ImageCard.listOfItems.shuffled().random()
 }
