@@ -6,15 +6,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +32,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnnecessaryComposedModifier")
@@ -49,11 +44,8 @@ fun Modifier.dpadFocusable(
     shouldResizeOnFocus: Boolean = true,
     boxInteractionSource: MutableInteractionSource = MutableInteractionSource(),
     isItemFocused: Boolean,
-    columnState: LazyListState? = null,
-    rowState: LazyListState? = null,
-    rowItemIndex: Int? = null,
-    columnItemIndex: Int? = null,
     isCarousel: Boolean = false,
+    leanbackListActions: LeanbackListActions = LeanbackListActions(),
     carouselActionLeft: () -> Unit = {},
     carouselActionRight: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -71,22 +63,6 @@ fun Modifier.dpadFocusable(
     var boxSize by remember {
         mutableStateOf(IntSize(0, 0))
     }
-
-    observeLazyListState(
-        isItemFocused = isItemFocused,
-        lazyListState = rowState,
-        itemIndex = rowItemIndex,
-        scope = scope,
-        distanceToScroll = boxSize.width.toFloat()
-    )
-
-    observeLazyListState(
-        isItemFocused = isItemFocused,
-        lazyListState = columnState,
-        itemIndex = columnItemIndex,
-        scope = scope,
-        distanceToScroll = boxSize.height.toFloat()
-    )
 
     LaunchedEffect(isItemFocused) {
         previousPress?.let {
@@ -121,6 +97,21 @@ fun Modifier.dpadFocusable(
                     Key.DirectionRight -> {
                         carouselActionRight()
                         return@onKeyEvent true
+                    }
+                }
+            } else {
+                when (it.key) {
+                    Key.DirectionLeft -> {
+                        leanbackListActions.onListLeft()
+                    }
+                    Key.DirectionRight -> {
+                        leanbackListActions.onListRight()
+                    }
+                    Key.DirectionUp -> {
+                        leanbackListActions.onListUp()
+                    }
+                    Key.DirectionDown -> {
+                        leanbackListActions.onListDown()
                     }
                 }
             }
@@ -166,38 +157,4 @@ fun Modifier.dpadFocusable(
             color = animatedBorderColor,
             shape = focusBorderShape
         )
-}
-
-@SuppressLint("ComposableNaming")
-@Composable
-fun observeLazyListState(
-    isItemFocused: Boolean,
-    lazyListState: LazyListState?,
-    itemIndex: Int?,
-    scope: CoroutineScope,
-    distanceToScroll: Float
-) {
-    if (isItemFocused) {
-        if (lazyListState?.isScrollInProgress == false) {
-            if (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == itemIndex) {
-                SideEffect {
-                    scope.launch {
-                        itemIndex?.let { _ ->
-                            lazyListState.animateScrollBy(distanceToScroll)
-                        }
-                    }
-                }
-            } else if (lazyListState.layoutInfo.visibleItemsInfo.first().index == itemIndex) {
-                SideEffect {
-                    scope.launch {
-                        itemIndex.let { nnRowItemIndex ->
-                            if (nnRowItemIndex > 0) {
-                                lazyListState.animateScrollToItem(nnRowItemIndex - 1)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
