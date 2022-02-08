@@ -1,5 +1,6 @@
 package com.example.jetback.ui.screens.landingScreen.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -73,6 +73,7 @@ fun ImageCard(
     LaunchedEffect(isItemFocused) {
         if (isItemFocused) {
             getCurrentSelectedMovie(imageToDisplay)
+            Log.d("MyTag", "Column:$columnItemIndex\tRow:$rowItemIndex")
         }
     }
 
@@ -145,14 +146,15 @@ fun ImageCard(
                 contentScale = ContentScale.Crop
             )
             Text(
-                rowItemIndex.toString(),
+                "$columnItemIndex, $rowItemIndex",
                 modifier = Modifier
                     .padding(8.dp)
-                    .align(Alignment.TopStart)
                     .background(
                         color = Color.Black,
-                        shape = CircleShape
+                        shape = RoundedCornerShape(15)
                     )
+                    .padding(8.dp)
+                    .align(Alignment.TopStart)
             )
             AnimatedVisibility(
                 visible = isItemFocused,
