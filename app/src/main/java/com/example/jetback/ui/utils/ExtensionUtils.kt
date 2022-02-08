@@ -44,10 +44,8 @@ fun Modifier.dpadFocusable(
     shouldResizeOnFocus: Boolean = true,
     boxInteractionSource: MutableInteractionSource = MutableInteractionSource(),
     isItemFocused: Boolean,
-    isCarousel: Boolean = false,
+    carouselActions: CarouselActions? = null,
     leanbackListActions: LeanbackListActions = LeanbackListActions(),
-    carouselActionLeft: () -> Unit = {},
-    carouselActionRight: () -> Unit = {},
     onClick: () -> Unit = {},
 ) = composed {
     val animatedBorderColor by animateColorAsState(
@@ -88,14 +86,14 @@ fun Modifier.dpadFocusable(
             onClick()
         }
         .onKeyEvent {
-            if (isCarousel) {
+            if (carouselActions != null) {
                 when (it.key) {
                     Key.DirectionLeft -> {
-                        carouselActionLeft()
+                        carouselActions.onCarouselLeft()
                         return@onKeyEvent true
                     }
                     Key.DirectionRight -> {
-                        carouselActionRight()
+                        carouselActions.onCarouselRight()
                         return@onKeyEvent true
                     }
                 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.example.jetback.ui.utils.CarouselActions
 import com.example.jetback.ui.utils.dpadFocusable
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -119,29 +120,30 @@ private fun CarouselImage(
             .fillMaxSize()
             .dpadFocusable(
                 isItemFocused = false,
-                isCarousel = true,
-                carouselActionLeft = {
-                    coroutineScope.launch {
-                        if (!carouselState.isScrollInProgress) {
-                            if (carouselState.currentPage > 0) {
-                                carouselState.animateScrollToPage(carouselState.currentPage - 1)
-                            } else {
-                                carouselState.animateScrollToPage(carouselState.pageCount - 1)
+                carouselActions = CarouselActions(
+                    onCarouselLeft = {
+                        coroutineScope.launch {
+                            if (!carouselState.isScrollInProgress) {
+                                if (carouselState.currentPage > 0) {
+                                    carouselState.animateScrollToPage(carouselState.currentPage - 1)
+                                } else {
+                                    carouselState.animateScrollToPage(carouselState.pageCount - 1)
+                                }
+                            }
+                        }
+                    },
+                    onCarouselRight = {
+                        coroutineScope.launch {
+                            if (!carouselState.isScrollInProgress) {
+                                if (carouselState.currentPage < carouselState.pageCount - 1) {
+                                    carouselState.animateScrollToPage(carouselState.currentPage + 1)
+                                } else {
+                                    carouselState.animateScrollToPage(0)
+                                }
                             }
                         }
                     }
-                },
-                carouselActionRight = {
-                    coroutineScope.launch {
-                        if (!carouselState.isScrollInProgress) {
-                            if (carouselState.currentPage < carouselState.pageCount - 1) {
-                                carouselState.animateScrollToPage(carouselState.currentPage + 1)
-                            } else {
-                                carouselState.animateScrollToPage(0)
-                            }
-                        }
-                    }
-                }
+                )
             )
     ) { index ->
         val imagePainter =
