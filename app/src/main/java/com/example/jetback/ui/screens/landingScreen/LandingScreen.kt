@@ -2,6 +2,7 @@ package com.example.jetback.ui.screens.landingScreen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import com.example.jetback.ui.screens.landingScreen.components.ImageCard
 import com.example.jetback.ui.screens.landingScreen.components.ImmersiveCluster
 import com.example.jetback.ui.screens.landingScreen.components.ScaffoldDrawer
 import com.example.jetback.ui.screens.landingScreen.components.ScaffoldTopBar
+import com.example.jetback.ui.screens.landingScreen.components.SideNavigation
 import com.example.jetback.ui.theme.JetbackTheme
 import kotlinx.coroutines.launch
 
@@ -56,39 +58,42 @@ fun LandingScreen() {
                 ScaffoldDrawer(scaffoldState)
             }
         ) {
-            BoxWithConstraints(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopStart
-            ) {
-                ImmersiveCluster(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.6f),
-                    movie = currentMovie
-                )
-                val columnState = rememberLazyListState()
-                LazyColumn(
-                    state = columnState,
-                    modifier = Modifier.fillMaxSize()
+            Row {
+                SideNavigation()
+                BoxWithConstraints(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.TopStart
                 ) {
-                    item {
-                        Spacer(modifier = Modifier.height(maxHeight / 2))
-                    }
-                    repeat(times = 10) { columnItemIndex ->
+                    ImmersiveCluster(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.6f),
+                        movie = currentMovie
+                    )
+                    val columnState = rememberLazyListState()
+                    LazyColumn(
+                        state = columnState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
                         item {
-                            val rowState = rememberLazyListState()
-                            LazyRow(state = rowState) {
-                                repeat(times = 10) { rowItemIndex ->
-                                    item {
-                                        ImageCard(
-                                            columnState = columnState,
-                                            rowState = rowState,
-                                            rowItemIndex = rowItemIndex,
-                                            columnItemIndex = columnItemIndex,
-                                            getCurrentSelectedMovie = { currentSelectedMovie ->
-                                                currentMovie = currentSelectedMovie
-                                            }
-                                        )
+                            Spacer(modifier = Modifier.height(maxHeight / 2))
+                        }
+                        repeat(times = 10) { columnItemIndex ->
+                            item {
+                                val rowState = rememberLazyListState()
+                                LazyRow(state = rowState) {
+                                    repeat(times = 10) { rowItemIndex ->
+                                        item {
+                                            ImageCard(
+                                                columnState = columnState,
+                                                rowState = rowState,
+                                                rowItemIndex = rowItemIndex,
+                                                columnItemIndex = columnItemIndex,
+                                                getCurrentSelectedMovie = { currentSelectedMovie ->
+                                                    currentMovie = currentSelectedMovie
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                             }

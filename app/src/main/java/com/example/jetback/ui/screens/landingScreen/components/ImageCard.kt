@@ -1,6 +1,5 @@
 package com.example.jetback.ui.screens.landingScreen.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -73,7 +72,6 @@ fun ImageCard(
     LaunchedEffect(isItemFocused) {
         if (isItemFocused) {
             getCurrentSelectedMovie(imageToDisplay)
-            Log.d("MyTag", "Column:$columnItemIndex\tRow:$rowItemIndex")
         }
     }
 
@@ -87,7 +85,11 @@ fun ImageCard(
                 leanbackListActions = LeanbackListActions(
                     onListLeft = {
                         val firstItemIndex = rowState.layoutInfo.visibleItemsInfo.first().index
-                        if (firstItemIndex == rowItemIndex) {
+                        if (firstItemIndex + 1 == rowItemIndex) {
+                            coroutineScope.launch {
+                                rowState.animateScrollBy(-(with(localDensity) { ImageCard.CardPadding.dp.toPx() * 2 }))
+                            }
+                        } else if (firstItemIndex == rowItemIndex) {
                             coroutineScope.launch {
                                 rowState.animateScrollBy(-(with(localDensity) { ImageCard.CardWidth.dp.toPx() }))
                             }
