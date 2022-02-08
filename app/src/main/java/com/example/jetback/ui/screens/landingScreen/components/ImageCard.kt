@@ -20,6 +20,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,13 +61,21 @@ fun ImageCard(
     columnState: LazyListState,
     rowState: LazyListState,
     rowItemIndex: Int,
-    columnItemIndex: Int
+    columnItemIndex: Int,
+    getCurrentSelectedMovie: (Pair<Pair<Int, String>, String>?) -> Unit
 ) {
     val boxInteractionSource = remember { MutableInteractionSource() }
     val isItemFocused by boxInteractionSource.collectIsFocusedAsState()
     val imageToDisplay by remember { mutableStateOf(getRandomImageId()) }
     val coroutineScope = rememberCoroutineScope()
     val localDensity = LocalDensity.current
+
+    LaunchedEffect(isItemFocused) {
+        if (isItemFocused) {
+            getCurrentSelectedMovie(imageToDisplay)
+        }
+    }
+
     Card(
         modifier = Modifier
             .size(width = ImageCard.CardWidth.dp, height = ImageCard.CardHeight.dp)
