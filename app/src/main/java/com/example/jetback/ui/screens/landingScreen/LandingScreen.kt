@@ -28,7 +28,9 @@ import com.example.jetback.ui.screens.landingScreen.components.ImageCard
 import com.example.jetback.ui.screens.landingScreen.components.ImmersiveCluster
 import com.example.jetback.ui.screens.landingScreen.components.ScaffoldDrawer
 import com.example.jetback.ui.screens.landingScreen.components.ScaffoldTopBar
+import com.example.jetback.ui.screens.landingScreen.components.SideNavItem
 import com.example.jetback.ui.screens.landingScreen.components.SideNavigation
+import com.example.jetback.ui.screens.landingScreen.components.UserDp
 import com.example.jetback.ui.theme.JetbackTheme
 import kotlinx.coroutines.launch
 
@@ -59,7 +61,21 @@ fun LandingScreen() {
             }
         ) {
             Row {
-                SideNavigation()
+                val allStates: MutableList<Boolean> = remember { mutableListOf() }
+                var isExpanded by remember { mutableStateOf(false) }
+
+                SideNavigation(isExpanded = isExpanded) { isSideBarExpanded ->
+                    UserDp(isExpanded = isSideBarExpanded)
+                    repeat(6) { index ->
+                        SideNavItem(
+                            allStates = allStates,
+                            index = index,
+                            isExpanded = isSideBarExpanded,
+                            onExpandChange = { isExpanded = allStates.contains(true) }
+                        )
+                    }
+                }
+
                 BoxWithConstraints(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.TopStart

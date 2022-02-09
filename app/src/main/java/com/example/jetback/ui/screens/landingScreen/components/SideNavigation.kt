@@ -14,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,9 +29,7 @@ import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -73,11 +72,14 @@ object SideNavigation {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SideNavigation() {
-    val allStates: MutableList<Boolean> = remember { mutableListOf() }
-    var isExpanded by remember { mutableStateOf(false) }
+fun SideNavigation(
+    isExpanded: Boolean,
+    expandedColor: Color = MaterialTheme.colors.surface,
+    collapsedColor: Color = Color.Black,
+    content: @Composable ColumnScope.(Boolean) -> Unit,
+) {
     val columnBgColorState by animateColorAsState(
-        targetValue = if (isExpanded) MaterialTheme.colors.surface else Color.Black,
+        targetValue = if (isExpanded) expandedColor else collapsedColor,
     )
 
     Column(
@@ -87,21 +89,13 @@ fun SideNavigation() {
             .padding(vertical = SideNavigation.MasterVerticalPadding.dp),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        UserDp(isExpanded = isExpanded)
-        repeat(6) { index ->
-            SideNavItem(
-                allStates = allStates,
-                index = index,
-                isExpanded = isExpanded,
-                onExpandChange = { isExpanded = allStates.contains(true) }
-            )
-        }
+        content(isExpanded)
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SideNavItem(
+fun SideNavItem(
     allStates: MutableList<Boolean>,
     index: Int,
     isExpanded: Boolean,
@@ -165,7 +159,7 @@ private fun SideNavItem(
 }
 
 @Composable
-private fun UserDp(isExpanded: Boolean) {
+fun UserDp(isExpanded: Boolean) {
     val userDpState by animateFloatAsState(
         targetValue = if (isExpanded) SideNavigation.UserDpExpandedSize
         else SideNavigation.UserDpCollapsedSize
