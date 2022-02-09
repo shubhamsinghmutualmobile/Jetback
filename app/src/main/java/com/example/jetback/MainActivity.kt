@@ -16,7 +16,10 @@ import com.example.jetback.ui.screens.landingScreen.components.UserAccountPictur
 import com.example.jetback.ui.theme.JetbackTheme
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterialApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
+    @OptIn(
+        ExperimentalMaterialApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class,
+        androidx.compose.animation.ExperimentalAnimationApi::class
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -34,9 +37,13 @@ class MainActivity : ComponentActivity() {
                         endItem = {
                             UserAccountPicture()
                         },
-                        content = {
-                            LandingScreen()
-                        }
+                        content = listOf(
+                            { LandingScreen() },
+                            { Text("New Screen", modifier = Modifier.fillMaxSize()) },
+                            { Text("Another Screen", modifier = Modifier.fillMaxSize()) },
+                            { Text("One More Screen", modifier = Modifier.fillMaxSize()) },
+                            { Text("Final Screen", modifier = Modifier.fillMaxSize()) },
+                        )
                     )
                 }
             }

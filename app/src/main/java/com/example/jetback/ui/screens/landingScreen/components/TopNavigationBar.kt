@@ -1,7 +1,12 @@
 package com.example.jetback.ui.screens.landingScreen.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,13 +53,14 @@ sealed class TopNavigationBarType {
     object LeftAligned : TopNavigationBarType()
 }
 
+@ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
 fun TopNavigationBar(
     type: TopNavigationBarType,
     totalItems: Int,
     endItem: @Composable () -> Unit,
-    content: @Composable () -> Unit,
+    content: List<@Composable () -> Unit>,
 ) {
     var currentSelectedIndex by remember { mutableStateOf(0) }
     Column(
@@ -86,14 +92,24 @@ fun TopNavigationBar(
             )
             endItem()
         }
-        content()
+        AnimatedContent(
+            targetState = currentSelectedIndex,
+            transitionSpec = { slideInHorizontally() with fadeOut() }
+        ) { selectedScreenIndex ->
+            content[selectedScreenIndex]()
+        }
     }
 }
 
+@ExperimentalComposeUiApi
 @Composable
 fun UserAccountPicture() {
     Surface(
-        modifier = Modifier.size(32.dp),
+        modifier = Modifier
+            .size(32.dp)
+            .dpadFocusable(
+                isItemFocused = false
+            ),
         shape = CircleShape
     ) {
         Image(
