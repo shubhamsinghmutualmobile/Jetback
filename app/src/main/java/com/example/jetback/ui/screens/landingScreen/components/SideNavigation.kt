@@ -13,11 +13,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -33,10 +35,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
@@ -70,26 +74,74 @@ object SideNavigation {
         )
 }
 
+sealed class SideNavigationType {
+    class Overlay(val padding: Dp) : SideNavigationType()
+    object Pushing : SideNavigationType()
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SideNavigation(
+    type: SideNavigationType = SideNavigationType.Pushing,
     isExpanded: Boolean,
     expandedColor: Color = MaterialTheme.colors.surface,
     collapsedColor: Color = Color.Black,
-    content: @Composable ColumnScope.(Boolean) -> Unit,
+    content: @Composable () -> Unit,
+    sideNavigationContent: @Composable ColumnScope.(Boolean) -> Unit,
 ) {
     val columnBgColorState by animateColorAsState(
         targetValue = if (isExpanded) expandedColor else collapsedColor,
     )
 
+    when (type) {
+        is SideNavigationType.Pushing -> {
+            Row(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                SideNavigationContent(columnBgColorState, type, sideNavigationContent, isExpanded)
+                content()
+            }
+        }
+        is SideNavigationType.Overlay -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Row {
+                    Spacer(
+                        modifier = Modifier.padding(start = type.padding)
+                    )
+                    content()
+                }
+                SideNavigationContent(columnBgColorState, type, sideNavigationContent, isExpanded)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SideNavigationContent(
+    columnBgColorState: Color,
+    type: SideNavigationType,
+    sideNavigationContent: @Composable ColumnScope.(Boolean) -> Unit,
+    isExpanded: Boolean
+) {
     Column(
         modifier = Modifier
-            .background(color = columnBgColorState)
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        columnBgColorState,
+                        if (type == SideNavigationType.Pushing || !isExpanded) columnBgColorState else Color.Transparent,
+                    ),
+                    startX = if (isExpanded) 250f else 0f
+                )
+            )
             .fillMaxHeight()
             .padding(vertical = SideNavigation.MasterVerticalPadding.dp),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        content(isExpanded)
+        sideNavigationContent(isExpanded)
     }
 }
 

@@ -60,19 +60,20 @@ fun ImmersiveCluster(
     movie: Pair<Pair<Int, String>, String>?,
 ) {
     BoxWithConstraints(
-        modifier = modifier
-            .dpadFocusable(
-                isItemFocused = false,
-                shouldResizeOnFocus = false,
-            ),
+        modifier = modifier,
         contentAlignment = Alignment.CenterStart
     ) {
         AnimatedContent(
             targetState = movie?.first?.first,
-            transitionSpec = { ImmersiveCluster.defaultTransition }
+            transitionSpec = { ImmersiveCluster.defaultTransition },
         ) { movieImage ->
             Image(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .dpadFocusable(
+                        isItemFocused = false,
+                        shouldResizeOnFocus = false,
+                    ),
                 painter = rememberImagePainter(
                     data = movieImage ?: Color.Black
                 ) {
